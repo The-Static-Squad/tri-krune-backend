@@ -2,6 +2,7 @@ require("dotenv/config");
 const express = require("express");
 const app = express();
 const logger = require("morgan");
+const mongoose = require("mongoose");
 
 const api = process.env.API_URL;
 const productsRouter = require('./routes/product');
