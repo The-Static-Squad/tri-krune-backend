@@ -11,7 +11,7 @@ const productsRouter = require('./routes/product');
 app.use(express.json());
 app.use(logger("tiny"));
 
-app.use(`${api}/products`, productsRouter);
+app.use(api, productsRouter);
 
 // const Product = require('./models/product');
 
