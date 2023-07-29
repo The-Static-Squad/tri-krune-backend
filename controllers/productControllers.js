@@ -2,7 +2,7 @@ const Product = require('../models/product');
 const mongoose = require('mongoose');
 
 const getAllProducts = async (req, res) => {
-	const products = await Product.find({}).sort({name: 1});
+	const products = await Product.find({}).sort({ name: 1 });
 
 	if (products.length === 0) {
 		return res.status(404).json({ 'message': 'no products found' })
@@ -48,7 +48,7 @@ const deleteProduct = async (req, res) => {
 		return res.status(404).json({ message: 'invalid Id' });
 	}
 
-	const deletedProduct = await Product.findOneAndDelete({_id: id});
+	const deletedProduct = await Product.findOneAndDelete({ _id: id });
 
 	if (!deletedProduct) {
 		return res.status(404).json({ "message": "No such product" });
@@ -71,7 +71,7 @@ const updateProduct = async (req, res) => {
 		return res.status(404).json({ message: 'Product hasn\'t been found' });
 	}
 
-	res.status(200).json({productToUpdate, newValues});
+	res.status(200).json({ productToUpdate, newValues });
 }
 
 module.exports = {
