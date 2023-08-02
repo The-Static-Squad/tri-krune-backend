@@ -10,7 +10,7 @@ const searchByText = async (req, res) => {
 	const userQuery = new RegExp(tempQuery.join('|'), 'i');
 
 	if (!userQuery || tempQuery.length === 0) {
-		return;
+		return res.status(400).json({message:'No search parameters'});
 	}
 
 	const searchedProducts = await Product.find(
