@@ -32,13 +32,12 @@ const addProduct = async (req, res) => {
 	const data = req.body;
 	const product = new Product({ name: data.name, price: data.price, image: data.image });
 
-	const addedProduct = await product.save();
-
-	if (!addedProduct) {
-		return res.status(400).json({ "message": "Product hasn't been saved" })
+	try {
+		const addedProduct = await product.save();
+		res.status(201).json(addedProduct);
+	} catch (error) {
+		return res.status(400).json({ error: error.message })
 	}
-
-	res.status(201).json(addedProduct);
 }
 
 const deleteProduct = async (req, res) => {
