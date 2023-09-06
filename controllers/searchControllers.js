@@ -10,14 +10,15 @@ const searchByText = async (req, res) => {
 	const userQuery = new RegExp(tempQuery.join('|'), 'i');
 
 	if (!userQuery || tempQuery.length === 0) {
-		return res.status(400).json({message:'No search parameters'});
+		return res.status(400).json({ message: 'No search parameters' });
 	}
 
 	const searchedProducts = await Product.find(
 		{
 			$or: [
-				{name: { $regex: userQuery } },
-				{image: { $regex: userQuery} }
+				{ name: { $regex: userQuery } },
+				{ category: { $regex: userQuery } },
+				{ tags: { $regex: userQuery } }
 			]
 		}
 	)
