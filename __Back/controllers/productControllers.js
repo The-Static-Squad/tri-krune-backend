@@ -30,7 +30,7 @@ const getProductById = async (req, res) => {
 
 const addProduct = async (req, res) => {
 	const data = req.body;
-	const product = new Product({ name: data.name, price: data.price, image: data.image });
+	const product = new Product({ ...data });
 
 	try {
 		const addedProduct = await product.save();
@@ -70,8 +70,10 @@ const updateProduct = async (req, res) => {
 		return res.status(404).json({ message: 'Product hasn\'t been found' });
 	}
 
-	res.status(200).json({productToUpdate, newValues});
+	res.status(200).json({ productToUpdate, newValues });
+
 }
+
 
 module.exports = {
 	getAllProducts,

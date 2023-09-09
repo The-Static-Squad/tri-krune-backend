@@ -4,7 +4,8 @@ const {
 	getProductById,
 	addProduct,
 	deleteProduct,
-	updateProduct
+	updateProduct,
+	clearDBase
 } = require('../controllers/productControllers');
 
 const express = require('express');
@@ -18,6 +19,6 @@ router.post('/', addProduct);
 
 router.delete('/:id', deleteProduct);
 
-router.patch('/:id', updateProduct)
+router.patch('/:id', updateProduct);
 
 module.exports = router;

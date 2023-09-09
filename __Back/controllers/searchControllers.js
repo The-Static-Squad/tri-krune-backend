@@ -8,6 +8,7 @@ const searchByText = async (req, res) => {
 	}
 
 	const userQuery = new RegExp(tempQuery.join('|'), 'i');
+	console.log(userQuery);
 
 	if (!userQuery || tempQuery.length === 0) {
 		return res.status(400).json({ message: 'No search parameters' });
@@ -16,9 +17,10 @@ const searchByText = async (req, res) => {
 	const searchedProducts = await Product.find(
 		{
 			$or: [
-				{ name: { $regex: userQuery } },
+				{ title: { $regex: userQuery } },
 				{ category: { $regex: userQuery } },
-				{ tags: { $regex: userQuery } }
+				{ tags: { $regex: userQuery } },
+				{ description: { $regex: userQuery } }
 			]
 		}
 	)
