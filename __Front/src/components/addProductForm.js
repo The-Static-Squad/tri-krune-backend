@@ -12,7 +12,7 @@ const AddProductForm = () => {
 
 		const product = { title, description, category, price };
 
-		const productToAdd = await fetch('/api/products', {
+		const productToAdd = await fetch('/api/v1/products', {
 			method: 'POST',
 			body: JSON.stringify(product),
 			headers: {
