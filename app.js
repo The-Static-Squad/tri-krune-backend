@@ -7,6 +7,7 @@ const mongoose = require("mongoose");
 const api = process.env.API_URL;
 const productsRouter = require('./routes/product');
 const searchRouter = require('./routes/search');
+const categoriesRouter = require('./routes/categories');
 
 // Middleware
 app.use(express.json());
@@ -14,8 +15,7 @@ app.use(logger("tiny"));
 
 app.use(`${api}/products`, productsRouter);
 app.use(`${api}/search`, searchRouter);
-
-// const Product = require('./models/product');
+app.use(`${api}/categories`, categoriesRouter);
 
 mongoose
   .connect(process.env.CONNECTION_STRING, { useNewUrlParser: true })
