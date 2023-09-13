@@ -3,8 +3,14 @@ const express = require("express");
 const app = express();
 const logger = require("morgan");
 const mongoose = require("mongoose");
+const cors = require("cors");
+
+app.use(cors());
+app.options("*", cors());
 
 const api = process.env.API_URL;
+const dbName = process.env.DB_NAME;
+
 const productsRouter = require('./routes/product');
 const searchRouter = require('./routes/search');
 const categoriesRouter = require('./routes/categories');
@@ -18,7 +24,11 @@ app.use(`${api}/search`, searchRouter);
 app.use(`${api}/categories`, categoriesRouter);
 
 mongoose
-  .connect(process.env.CONNECTION_STRING, { useNewUrlParser: true })
+  .connect(process.env.CONNECTION_STRING, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    dbName: dbName,
+  })
   .then(() => {
     console.log("Database connection is ready");
   })

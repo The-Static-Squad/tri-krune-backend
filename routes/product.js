@@ -5,7 +5,6 @@ const {
 	addProduct,
 	deleteProduct,
 	updateProduct,
-	clearDBase
 } = require('../controllers/productControllers');
 
 const express = require('express');
