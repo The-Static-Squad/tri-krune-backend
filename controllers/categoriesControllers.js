@@ -63,8 +63,6 @@ const updateCategory = async (req, res) =>{
 	const idToUpdate = req.params.id;
 	const newValue = req.body;
 
-	console.log(newValue)
-
 	if (mongoose.Types.ObjectId.isValid(idToUpdate)) {
 		const categoryUpdated = await Category.findByIdAndUpdate(idToUpdate, 
 		{
