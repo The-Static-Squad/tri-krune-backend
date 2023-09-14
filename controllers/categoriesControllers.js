@@ -27,8 +27,12 @@ const getCategory = async (req, res) => {
 }
 
 const addCategory = async (req, res) => {
-	const categoryName = req.body.name;
-	const newCategory = new Category({name:categoryName})
+	const { name, icon } = req.body;
+
+	const newCategory = new Category({
+		name: name,
+		icon: icon
+	})
 
 	try {
 		const categoryAdded = await newCategory.save();
@@ -57,10 +61,16 @@ const deleteCategory = async (req, res) => {
 
 const updateCategory = async (req, res) =>{
 	const idToUpdate = req.params.id;
-	const newValue = req.body.name;
+	const newValue = req.body;
+
+	console.log(newValue)
 
 	if (mongoose.Types.ObjectId.isValid(idToUpdate)) {
-		const categoryUpdated = await Category.findOneAndUpdate({ _id: idToUpdate }, {name: newValue});
+		const categoryUpdated = await Category.findByIdAndUpdate(idToUpdate, 
+		{
+			name: newValue.name,
+			icon: newValue.icon
+		});
 
 		if (categoryUpdated) {
 			return res.status(200).json({categoryUpdated, newValue});
