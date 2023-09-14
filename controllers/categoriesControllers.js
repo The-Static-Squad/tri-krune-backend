@@ -17,7 +17,7 @@ const getCategory = async (req, res) => {
 	if (!mongoose.Types.ObjectId.isValid(idToFind)) {
 		return res.status(400).json({message: "No such Id"})
 	}
-	const category = await Category.find({ _id: idToFind });
+	const category = await Category.findById(idToFind);
 
 	if (!category) {
 		return res.status(404).json({message: "Category with specified Id not found"})
