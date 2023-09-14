@@ -16,6 +16,6 @@ router.delete('/:id', deleteCategory);
 
 router.post('/', addCategory);
 
-router.patch('/:id', updateCategory);
+router.put('/:id', updateCategory);
 
 module.exports = router;
