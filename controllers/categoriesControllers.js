@@ -64,14 +64,14 @@ const updateCategory = async (req, res) =>{
 	const newValue = req.body;
 
 	if (mongoose.Types.ObjectId.isValid(idToUpdate)) {
-		const categoryUpdated = await Category.findByIdAndUpdate(idToUpdate, 
+		const category = await Category.findByIdAndUpdate(idToUpdate, 
 		{
 			name: newValue.name,
 			icon: newValue.icon
 		});
 
-		if (categoryUpdated) {
-			return res.status(200).json({categoryUpdated, newValue});
+		if (category) {
+			return res.status(200).json(category);
 		} else {
 			return res.status(404).json({message: "No category with specified Id"})
 		}
