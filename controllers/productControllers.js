@@ -29,8 +29,17 @@ const getProductById = async (req, res) => {
 }
 
 const addProduct = async (req, res) => {
+
 	const data = req.body;
 	const product = new Product({ ...data });
+
+	const mainImage = req.file;
+
+	if (!mainImage) {
+		return res.status(400).json({ error: "Image upload failed" });
+	} else {
+		product.mainImg = mainImage.path;
+	}
 
 	try {
 		const addedProduct = await product.save();
