@@ -27,7 +27,7 @@ app.use(`${api}/search`, searchRouter);
 app.use(`${api}/categories`, categoriesRouter);
 
 mongoose
-  .connect(process.env.CONNECTION_STRING, {
+  .connect(process.env.ANOTHER, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     dbName: dbName,

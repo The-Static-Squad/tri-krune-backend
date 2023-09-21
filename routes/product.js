@@ -46,11 +46,12 @@ const upload = multer(
 	}
 );
 
+
 router.get('/', getAllProducts);
 
 router.get('/:id', getProductById);
 
-router.post('/', upload.single('prodImage'), addProduct);
+router.post('/', upload.fields([{name:'prodImage', maxCount:1}, {name: 'additionalImgs', maxCount: 3}]), addProduct);
 
 router.delete('/:id', deleteProduct);
 

@@ -33,20 +33,24 @@ const addProduct = async (req, res) => {
 	const data = req.body;
 	const product = new Product({ ...data });
 
-	const mainImage = req.file;
+	const mainImage = req.files['prodImage'][0];
+
 
 	if (!mainImage) {
 		return res.status(400).json({ error: "Image upload failed" });
 	} else {
 		product.mainImg = mainImage.path;
+		res.status(200).json({uploaded: req.files})
 	}
 
-	try {
+	//const additionalImages
+
+	/* try {
 		const addedProduct = await product.save();
 		res.status(201).json(addedProduct);
 	} catch (error) {
 		return res.status(400).json({ error: error.message })
-	}
+	} */
 }
 
 const deleteProduct = async (req, res) => {
