@@ -2,7 +2,7 @@ const Product = require('../models/product');
 const mongoose = require('mongoose');
 
 const getAllProducts = async (req, res) => {
-	const products = await Product.find({}).sort({name: -1});
+	const products = await Product.find({}).sort({ name: -1 });
 
 	if (products.length === 0) {
 		return res.status(404).json({ 'message': 'no products found' })
@@ -33,24 +33,37 @@ const addProduct = async (req, res) => {
 	const data = req.body;
 	const product = new Product({ ...data });
 
-	const mainImage = req.files['prodImage'][0];
-
-
-	if (!mainImage) {
-		return res.status(400).json({ error: "Image upload failed" });
-	} else {
-		product.mainImg = mainImage.path;
-		res.status(200).json({uploaded: req.files})
+	//convert tags input from a string to an array
+	if (product.tags.length !== 0) {
+		const tagArray = product.tags[0].split(' ');
+		tagArray.forEach(tag => {
+			tag = tag.trim();
+		});
+		product.tags = tagArray;
 	}
 
-	//const additionalImages
+	//add image paths to appropriate fields
+	const images = req.files;
 
-	/* try {
+	if (!images) {
+		return res.status(400).json({ error: "Image upload failed" });
+	} else {
+
+		const mainImg = images['prodImage'][0];
+		const additionalImgs = images['addImages']
+		product.mainImg = mainImg.path;
+
+		additionalImgs.forEach(image => {
+			product.pictures.push(image.path);
+		});
+	}
+
+	try {
 		const addedProduct = await product.save();
 		res.status(201).json(addedProduct);
 	} catch (error) {
 		return res.status(400).json({ error: error.message })
-	} */
+	}
 }
 
 const deleteProduct = async (req, res) => {
@@ -60,7 +73,7 @@ const deleteProduct = async (req, res) => {
 		return res.status(404).json({ message: 'invalid Id' });
 	}
 
-	const deletedProduct = await Product.findOneAndDelete({_id: id});
+	const deletedProduct = await Product.findOneAndDelete({ _id: id });
 
 	if (!deletedProduct) {
 		return res.status(404).json({ "message": "No such product" });
@@ -86,7 +99,6 @@ const updateProduct = async (req, res) => {
 	res.status(200).json({ productToUpdate, newValues });
 
 }
-
 
 module.exports = {
 	getAllProducts,
