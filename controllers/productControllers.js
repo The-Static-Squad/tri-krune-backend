@@ -36,19 +36,17 @@ const addProduct = async (req, res) => {
 	//convert tags input from a string to an array
 	if (product.tags.length !== 0) {
 		const tagArray = product.tags[0].split(' ');
+		product.tags = [];
 		tagArray.forEach(tag => {
-			tag = tag.trim();
+			if (tag.length > 0) {
+				product.tags.push(tag);
+			}
 		});
-		product.tags = tagArray;
 	}
 
 	//add image paths to appropriate fields
 	const images = req.files;
-
-	if (!images) {
-		return res.status(400).json({ error: "Image upload failed" });
-	} else {
-
+	if (images) {
 		const mainImg = images['prodImage'][0];
 		const additionalImgs = images['addImages']
 		product.mainImg = mainImg.path;
