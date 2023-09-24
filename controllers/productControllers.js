@@ -1,5 +1,6 @@
 const Product = require('../models/product');
 const mongoose = require('mongoose');
+const fs = require('fs');
 
 const getAllProducts = async (req, res) => {
 	const products = await Product.find({}).sort({ name: -1 });
@@ -68,13 +69,32 @@ const deleteProduct = async (req, res) => {
 	const id = req.params.id;
 
 	if (!mongoose.Types.ObjectId.isValid(id)) {
-		return res.status(404).json({ message: 'invalid Id' });
+		return res.status(400).json({ message: 'invalid Id' });
 	}
 
 	const deletedProduct = await Product.findOneAndDelete({ _id: id });
 
 	if (!deletedProduct) {
 		return res.status(404).json({ "message": "No such product" });
+	}
+
+	const allImgs = deletedProduct.pictures.concat(deletedProduct.mainImg);
+
+	console.log(allImgs);
+
+	const deleteErrors = [];
+
+	allImgs.forEach(image => {
+		try {
+			fs.unlinkSync(image);
+			console.log(image + " deleted")
+		} catch (err) {
+			deleteErrors.push(err);
+		}
+	});
+
+	if (deleteErrors.length > 0) {
+		return res.status(207).json({ message: "Product deleted, with errors in deleting files", images_not_deleted: deleteErrors, deleted_product : deletedProduct, })
 	}
 
 	res.status(200).json(deletedProduct);
