@@ -7,6 +7,8 @@ const {
 	updateProduct,
 } = require('../controllers/productControllers');
 
+const uploadMiddleWare = require('../middleware/upload');
+
 const express = require('express');
 const router = express.Router();
 
@@ -14,7 +16,7 @@ router.get('/', getAllProducts);
 
 router.get('/:id', getProductById);
 
-router.post('/', addProduct);
+router.post('/', uploadMiddleWare, addProduct);
 
 router.delete('/:id', deleteProduct);
 

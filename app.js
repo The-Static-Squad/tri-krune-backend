@@ -4,6 +4,7 @@ const app = express();
 const logger = require("morgan");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const bodyParser = require('body-parser');
 
 app.use(cors());
 app.options("*", cors());
@@ -18,6 +19,8 @@ const categoriesRouter = require('./routes/categories');
 // Middleware
 app.use(express.json());
 app.use(logger("tiny"));
+app.use(bodyParser.urlencoded({extended: true}));
+app.use('/public', express.static('public'));
 
 app.use(`${api}/products`, productsRouter);
 app.use(`${api}/search`, searchRouter);

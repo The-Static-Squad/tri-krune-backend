@@ -23,12 +23,14 @@ const productSchema = mongoose.Schema(
 		discountPrice: {
 			type: Number,
 		},
+		mainImg: {
+			type: String,
+		},
 		pictures: {
 			type: [String],
 		},
 		highlighted: {
 			type: Boolean,
-			required: false
 		}
 	},
 	{
