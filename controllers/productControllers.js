@@ -30,24 +30,39 @@ const getProductById = async (req, res) => {
 }
 
 const addProduct = async (req, res) => {
+	
+	// let tagsArray = [];
+	// if(req.body.tags) {
+	// 	tagsArray = JSON.parse(req.body.tags)
+	// }	
 
-	const data = req.body;
-	const product = new Product({ ...data });
+	const product = new Product({
+    name: req.body.name,
+    category: req.body.category,
+    description: req.body.description,
+		price: req.body.price,
+		discountPrice: req.body.discountPrice,
+		tags: JSON.parse(req.body.tags),
+		mainImg: req.body.mainImg,
+		pictures: req.body.pictures,
+		inStock: req.body.inStock,
+		highlighted: req.body.highlighted
+  });
 
 	//convert tags input from a string to an array
-	if (product.tags.length !== 0) {
-		const tagArray = product.tags[0].split(' ');
-		product.tags = [];
-		tagArray.forEach(tag => {
-			if (tag.length > 0) {
-				product.tags.push(tag);
-			}
-		});
-	}
+	// if (product.tags.length !== 0) {
+	// 	const tagArray = product.tags[0].split(' ');
+	// 	product.tags = [];
+	// 	tagArray.forEach(tag => {
+	// 		if (tag.length > 0) {
+	// 			product.tags.push(tag);
+	// 		}
+	// 	});
+	// }
 
 	//add image paths to appropriate fields
-	const images = req.files;
-	if (images) {
+	// const images = req.files;
+	if (req.files['prodImg'] && req.files['addImages']) {
 		const mainImg = images['prodImage'][0];
 		const additionalImgs = images['addImages']
 		product.mainImg = mainImg.path;
@@ -78,24 +93,28 @@ const deleteProduct = async (req, res) => {
 		return res.status(404).json({ "message": "No such product" });
 	}
 
-	const allImgs = deletedProduct.pictures.concat(deletedProduct.mainImg);
+	if(deletedProduct.pictures !== '' && deletedProduct.mainImg !== '') {
 
-	console.log(allImgs);
-
-	const deleteErrors = [];
-
-	allImgs.forEach(image => {
-		try {
-			fs.unlinkSync(image);
-			console.log(image + " deleted")
-		} catch (err) {
-			deleteErrors.push(err);
+		const allImgs = deletedProduct.pictures.concat(deletedProduct.mainImg);
+	
+		console.log(allImgs);
+	
+		const deleteErrors = [];
+	
+		allImgs.forEach(image => {
+			try {
+				fs.unlinkSync(image);
+				console.log(image + " deleted")
+			} catch (err) {
+				deleteErrors.push(err);
+			}
+		});
+	
+		if (deleteErrors.length > 0) {
+			return res.status(207).json({ message: "Product deleted, with errors in deleting files", images_not_deleted: deleteErrors, deleted_product : deletedProduct, })
 		}
-	});
-
-	if (deleteErrors.length > 0) {
-		return res.status(207).json({ message: "Product deleted, with errors in deleting files", images_not_deleted: deleteErrors, deleted_product : deletedProduct, })
 	}
+
 
 	res.status(200).json(deletedProduct);
 }

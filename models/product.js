@@ -7,7 +7,7 @@ const productSchema = mongoose.Schema(
 			required: true
 		},
 		category: {
-			type: [String],
+			type: String,
 			required: true
 		},
 		description: {
@@ -19,15 +19,18 @@ const productSchema = mongoose.Schema(
 		},
 		tags: {
 			type: [String],
+			default: ''
 		},
 		discountPrice: {
 			type: Number,
 		},
 		mainImg: {
 			type: String,
+			default: ''
 		},
 		pictures: {
 			type: [String],
+			default: ''
 		},
 		highlighted: {
 			type: Boolean,
