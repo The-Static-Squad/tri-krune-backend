@@ -50,11 +50,16 @@ const addProduct = async (req, res) => {
 	if (images) {
 		const mainImg = images['prodImage'][0];
 		const additionalImgs = images['addImages']
-		product.mainImg = mainImg.path;
 
-		additionalImgs.forEach(image => {
-			product.pictures.push(image.path);
-		});
+		if (mainImg) {
+			product.mainImg = mainImg.path;
+		}
+
+		if (additionalImgs) {
+			additionalImgs.forEach(image => {
+				product.pictures.push(image.path);
+			});
+		}
 	}
 
 	try {
@@ -80,8 +85,6 @@ const deleteProduct = async (req, res) => {
 
 	const allImgs = deletedProduct.pictures.concat(deletedProduct.mainImg);
 
-	console.log(allImgs);
-
 	const deleteErrors = [];
 
 	allImgs.forEach(image => {
@@ -106,6 +109,22 @@ const updateProduct = async (req, res) => {
 
 	if (!mongoose.Types.ObjectId.isValid(id)) {
 		return res(400).json({ message: 'invalid Id' });
+	}
+
+	const newMainImage = req.files['prodImage'];
+	const newAdditionalImages = req.files['addImages'];
+
+	if (newMainImage) {
+		newValues.mainImg = newMainImage[0].path;
+	}
+
+	if (newAdditionalImages) {
+
+		newValues.pictures = newValues.pictures.split(",");
+		newAdditionalImages.forEach(image => {
+
+				newValues.pictures.push(image.path);
+		});
 	}
 
 	const productToUpdate = await Product.findOneAndUpdate({ _id: id }, { ...newValues });
