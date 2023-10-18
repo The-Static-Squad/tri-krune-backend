@@ -42,13 +42,14 @@ const addProduct = async (req, res) => {
 	const product = new Product({ ...data });
 
 	//convert tags input from a string to an array
-	if (product.tags.length !== 0) {
-		product.tags = toArray(product.tags);
+	if (req.body.tags) {
+		product.tags = toArray(req.body.tags);
 	}
 
 	//add image paths to appropriate fields
 	if (req.files.prodImage) {
 		product.mainImg = req.files.prodImage[0].path;
+		console.log(product.mainImg)
 	}
 
 	if (req.files.addImages) {
@@ -128,7 +129,6 @@ const updateProduct = async (req, res) => {
 	//Check if the request holds the path of main image that should be kept
 	if (!newValues.mainImg) {
 
-		console.log("delete main")
 		//Remove old main image from the base, if set
 		if (oldMainImage) {
 			try {
