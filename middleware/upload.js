@@ -22,8 +22,7 @@ const uploadFiles = (req, res, next) => {
 
 	//Create image name on upload by the model: productName-imgNo.ext
 	const nameFile = (req, file) => {
-		const nn = req.body.name + '-img' + counter++ + path.extname(file.originalname);
-		return nn;
+		return req.body.name + '-img' + counter++ + path.extname(file.originalname);
 	}
 
 	//Exclude from the upload files that don't belong to allowed types
