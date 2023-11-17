@@ -9,7 +9,7 @@ const uploadFiles = (req, res, next) => {
 				cb(null, 'public/');
 			},
 			filename: (req, file, cb) => {
-				cb(null, Date.now() + "-" + file.originalname);
+				cb(null, Date.now() + '+' + file.originalname );
 			}
 		}
 	);

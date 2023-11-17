@@ -20,6 +20,6 @@ router.post('/', uploadMiddleWare, addProduct);
 
 router.delete('/:id', deleteProduct);
 
-router.patch('/:id', uploadMiddleWare, updateProduct);
+router.put('/:id', uploadMiddleWare, updateProduct);
 
 module.exports = router;

@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { Schema } = mongoose;
 
 const productSchema = mongoose.Schema(
   {
@@ -17,11 +18,19 @@ const productSchema = mongoose.Schema(
       type: Number,
       required: true,
     },
+    inStock: {
+        type: Number,
+        required: true,
+        min: 0,
+        max: 250
+    },
     tags: {
       type: [String],
     },
     discountPrice: {
-      type: Number,
+      // type: Number,
+      type: Schema.Types.Mixed, 
+      // default: null,
     },
     // images: [
     //   {
