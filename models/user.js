@@ -16,7 +16,7 @@ const userSchema = new mongoose.Schema({
   passwordHash: { type: String, required: true },
   address: addressSchema,
   company: { type: String, default: "" },
-  // phone: { type: Number required: true },
+  phone: { type: Number, required: true },
   isAdmin: { type: Boolean, default: false },
   dateCreated: { type: Date, default: Date.now },
 });
