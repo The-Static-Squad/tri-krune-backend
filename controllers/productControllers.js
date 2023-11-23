@@ -382,10 +382,21 @@ console.log(newImagesOrder)
   res.status(200).json({ productToUpdate });
 };
 
+const productCount = async (req, res) => {
+  const productCount = await Product.countDocuments({});
+
+  if (!productCount) {
+    return res.status(500).json({ success: false });
+  }
+
+  res.status(200).json({ productCount: productCount });
+};
+
 module.exports = {
   getAllProducts,
   getProductById,
   addProduct,
   deleteProduct,
   updateProduct,
+  productCount,
 };
