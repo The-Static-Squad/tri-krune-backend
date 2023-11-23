@@ -9,21 +9,13 @@ const uploadFiles = (req, res, next) => {
 				cb(null, 'public/');
 			},
 			filename: (req, file, cb) => {
-				cb(null, nameFile(req, file));
+				cb(null, Date.now() + '+' + file.originalname );
 			}
 		}
 	);
 
 	//Allowed max image size in Mb
 	const size = 5;
-
-	//Image counter per product-includes serial number of image uploaded to image name
-	let counter = 1;
-
-	//Create image name on upload by the model: productName-imgNo.ext
-	const nameFile = (req, file) => {
-		return req.body.name + '-img' + counter++ + path.extname(file.originalname);
-	}
 
 	//Exclude from the upload files that don't belong to allowed types
 	const fileTypeFilter = (req, imgFile, cllbck) => {
@@ -48,9 +40,9 @@ const uploadFiles = (req, res, next) => {
 		}
 	);
 
-	upload.fields([{ name: 'prodImage', maxCount: 1 }, { name: 'addImages', maxCount: 3 }])(req, res, (err) => {
+	upload.array('images', 5)(req, res, (err) => {
 		if (err) {
-			return res.status(400).json({ error: "Upload failed" });
+			return res.status(400).json({ error: "Upload failed", err });
 		}
 		next();
 	});

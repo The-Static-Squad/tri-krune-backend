@@ -1,210 +1,254 @@
-const Product = require('../models/product');
-const mongoose = require('mongoose');
-const fs = require('fs');
-const { findById } = require('../models/categories');
+const Product = require("../models/product");
+const mongoose = require("mongoose");
+const fs = require("fs");
 
-//Method to convert request strins that hold values for array-fields
-//splits tag string on each , or whitespace (single or sequence)
-const toArray = (str) => {
-	return str.split(/[,\s]+/).filter(elem => elem);
+function parseValue(value, type) {
+  if(type === 'number') {
+    return value === "null" ? 0 : value;
+  } else if (type === 'string'){
+    return value === "null" ? ' ' : value;;
+  }
 }
 
 const getAllProducts = async (req, res) => {
-	const products = await Product.find({}).sort({ name: -1 });
+  const products = await Product.find({}).sort({ name: -1 });
 
-	if (products.length === 0) {
-		return res.status(404).json({ 'message': 'no products found' })
-	}
+  if (products.length === 0) {
+    return res.status(404).json({ message: "no products found" });
+  }
 
-	res.status(200).json(products);
-}
+  res.status(200).json(products);
+};
 
 const getProductById = async (req, res) => {
-	const id = req.params.id
+  const id = req.params.id;
 
-	//check if id matches mongoose pattern
-	if (!mongoose.Types.ObjectId.isValid(id)) {
-		return res.status(404).json({ "message": "Invalid Id" });
-	}
+  //check if id matches mongoose pattern
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(404).json({ message: "Invalid Id" });
+  }
 
-	const product = await Product.findById(id);
+  const product = await Product.findById(id);
 
-	if (!product) {
-		return res.status(404).json({ "message": "Product not found" });
-	}
+  if (!product) {
+    return res.status(404).json({ message: "Product not found" });
+  }
 
-	res.status(200).json(product);
-}
+  res.status(200).json(product);
+};
 
 const addProduct = async (req, res) => {
+  const tags = req.body.tags || "[]";
+  let category = parseValue(req.body.category, "string");
 
-	const data = req.body;
-	const product = new Product({ ...data });
 
-	//convert tags input from a string to an array
-	if (req.body.tags) {
-		product.tags = toArray(req.body.tags);
-	}
+  const product = new Product({
+    name: req.body.name,
+    category: category,
+    description: req.body.description,
+    price: req.body.price,
+    discountPrice: req.body.discountPrice,
+    tags: JSON.parse(tags),
+    inStock: req.body.inStock,
+    highlighted: req.body.highlighted,
+  });
 
-	//add image paths to appropriate fields
-	if (req.files.prodImage) {
-		product.mainImg = req.files.prodImage[0].path;
-		console.log(product.mainImg)
-	}
+  if (req.files.length > 0) {
+    for (let image of req.files) {
+      const basePath = `${req.protocol}://${req.get("host")}/public/`;
+      const oldFilename = image.filename;
+      let position;
+      const newFilename = oldFilename
+        .split("+")
+        .filter((el, index) => {
+          if (index !== 1) {
+            return true;
+          } else {
+            position = el;
+            return false;
+          }
+        })
+        .join("-");
+      fs.rename(`public/${oldFilename}`, `public/${newFilename}`, (err) => {
+        if (err) {
+          console.error("Error renaming file:", err);
+        } else {
+          console.log("File renamed successfully.");
+        }
+      });
+      product.images[position] = basePath + newFilename;
+    }
+  }
 
-	if (req.files.addImages) {
-		req.files.addImages.forEach(image => {
-			product.pictures.push(image.path);
-		});
-	}
-
-	try {
-		const addedProduct = await product.save();
-		res.status(201).json(addedProduct);
-	} catch (error) {
-		return res.status(400).json({ error: error.message })
-	}
-}
+  try {
+    const addedProduct = await product.save();
+    res.status(201).json(addedProduct);
+  } catch (error) {
+    return res.status(400).json({ error: error.message });
+  }
+};
 
 const deleteProduct = async (req, res) => {
-	const id = req.params.id;
+  const id = req.params.id;
 
-	if (!mongoose.Types.ObjectId.isValid(id)) {
-		return res.status(404).json({ message: 'invalid Id' });
-	}
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(404).json({ message: "invalid Id" });
+  }
 
-	const deletedProduct = await Product.findOneAndDelete({ _id: id });
+  const deletedProduct = await Product.findByIdAndRemove(id);
 
-	if (!deletedProduct) {
-		return res.status(404).json({ "message": "No such product" });
-	}
+  if (!deletedProduct) {
+    return res.status(404).json({ message: "No such product" });
+  }
 
-	const allImgs = deletedProduct.pictures.concat(deletedProduct.mainImg);
+  const allImgs = deletedProduct.images;
 
-	const deleteErrors = [];
+  const deleteErrors = [];
 
-	allImgs.forEach(image => {
-		try {
-			fs.unlinkSync(image);
-		} catch (err) {
-			deleteErrors.push(err);
-		}
-	});
+  allImgs.forEach(image => {
+  	try {
+  		let extractedOldImagePath = image.split("/").slice(3).join("/");
+      fs.unlink(extractedOldImagePath, (err) => {
+        if (err) throw err;
+        console.log(`${extractedOldImagePath} was deleted`);
+      });
+  	} catch (err) {
+  		deleteErrors.push(err);
+  	}
+  });
 
-	if (deleteErrors.length > 0) {
-		return res.status(207).json({ message: "Product deleted, with errors in deleting files", images_not_deleted: deleteErrors, deleted_product: deletedProduct })
-	}
+  if (deleteErrors.length > 0) {
+    return res.status(207).json({
+      message: "Product deleted, with errors in deleting files",
+      images_not_deleted: deleteErrors,
+      deleted_product: deletedProduct,
+    });
+  }
 
-	res.status(200).json(deletedProduct);
-}
+  res.status(200).json(deletedProduct);
+};
 
 const updateProduct = async (req, res) => {
-	const id = req.params.id;
-	const newValues = req.body;
+  const id = req.params.id;
 
-	//Check if id passed as request parameter is valid mongodb id
-	if (!mongoose.Types.ObjectId.isValid(id)) {
-		return res(400).json({ message: 'invalid Id' });
-	}
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res(400).json({ message: "invalid Id" });
+  }
 
-	//convert tags string to an array of tags
-	if (newValues.tags) {
-		newValues.tags = toArray(newValues.tags);
-	}
+  const existingProduct = await Product.findById(id);
 
-	const product = await Product.findById(id);
+  if (!existingProduct) {
+    return res.status(404).json({ message: "Product hasn't been found" });
+  }
 
-	if (!product) {
-		return res.status(404).json({ message: 'Product hasn\'t been found' });
-	}
+  let oldImagesPaths = existingProduct.images;
+  let newImagesOrder = [];
 
-	let oldMainImage = product.mainImg; //previosly set main image
-	let oldAddImages = product.pictures; //previosly set additional images
+  if (req.files.length > 0) {
+    for (let image of req.files) {
+      const basePath = `${req.protocol}://${req.get("host")}/public/`;
+      const oldFilename = image.filename;
+      let position;
+      const newFilename = oldFilename
+        .split("+")
+        .filter((el, index) => {
+          if (index !== 1) {
+            return true;
+          } else {
+            position = el;
+            return false;
+          }
+        })
+        .join("-");
+      fs.rename(`public/${oldFilename}`, `public/${newFilename}`, (err) => {
+        if (err) {
+          console.error("Error renaming file:", err);
+        } else {
+          console.log("File renamed successfully.");
+        }
+      });
+      newImagesOrder[position] = basePath + newFilename;
+    }
+  }
 
-	const deleteErrors = [];
+  if (req.body.images) {
+    console.log(req.body.images)
+    for (let newImageOrder of req.body.images) {
+      let position;
+      
+      if(typeof req.body.images === 'string') {
+        newImageOrder = req.body.images;
+      }
 
+      const newPath = newImageOrder.split("+").filter((el, index) => {
+        if (index !== 0) {
+          return true;
+        } else {
+          position = el;
+          return false;
+        }
+      });
 
-	//Handle main image update
-	//************************
-	//Check if the request holds the path of main image that should be kept
-	if (!newValues.mainImg) {
+      newImagesOrder[position] = newPath[0];
+    }
+  }
 
-		//Remove old main image from the base, if set
-		if (oldMainImage) {
-			try {
-				fs.unlinkSync(oldMainImage);
-			} catch (err) {
-				deleteErrors.push(err);
-			}
-		}
+  for(oldImage of oldImagesPaths) {
+    if(!newImagesOrder.includes(oldImage)) {
+      let extractedOldImagePath = oldImage.split("/").slice(3).join("/");
 
-		//Check if new image had been added to request
-		if (req.files.prodImage) {
-			//Add new image path to the update values
-			//The first value in the first array responds to the product main image
-			//(Input field prodImage provides an array of attached files; it is limited to one value)
-			//Attach new main image path
-			newValues.mainImg = req.files.prodImage[0].path;
-		} else {
-			//remove main image from the product
-			newValues.mainImg = '';
-		}
-	}
+      fs.unlink(extractedOldImagePath, (err) => {
+        if (err) throw err;
+        console.log(`${extractedOldImagePath} was deleted`);
+      });
+    }
+  }
 
-	//Handle additional images update
-	//*******************************
+  const deleteErrors = [];
+ 
+  const tags = req.body.tags || "[]";
 
-	//Check if the request holds the paths of images that should be kept
-	//Make sure to get an array
-	if (!newValues.pictures) {
-		//If there's no pictures to be saved, create an empty array
-		newValues.pictures = [];
-	} else {
-		//If request holds a string of paths, convert it to array
-		if (typeof newValues.pictures === "string") {
-			newValues.pictures = newValues.pictures.split(',');
-		}
-	}
+  let discountPrice = parseValue(req.body.discountPrice, 'number');
+  let category = parseValue(req.body.category, 'string');
 
-	//Compare images' paths to be kept, sent by request body, with all previosly attached images' paths
-	//Compare arrays of images already attached to previous product version and delete unnecessary
-	oldAddImages.forEach(oldImg => {
-		if (!newValues.pictures.includes(oldImg)) {
-			try {
-				fs.unlinkSync(oldImg);
-			} catch (err) {
-				deleteErrors.push(err);
-			}
-		}
-	});
+  let productToUpdate = await Product.findByIdAndUpdate(id, {
+    name: req.body.name,
+    category: category,
+    description: req.body.description,
+    price: req.body.price,
+    discountPrice: discountPrice,
+    tags: JSON.parse(tags),
+    images: newImagesOrder,
+    inStock: req.body.inStock,
+    highlighted: req.body.highlighted,
+  });
 
-	//Check if new image(s) had been added to request
-	//Add new image path(s) to the update values
-	//The values in the second array respond to the product additional images
-	//(Input field addImages provides an array of attached files; it is limited to max three values)
-	if (req.files.addImages) {
-		//Add paths of new images to update values
-		newValues.pictures = newValues.pictures.concat(req.files.addImages.map(img => img.path));
-	}
+  if (deleteErrors.length > 0) {
+    return res.status(207).json({
+      message: "Product deleted, with errors in deleting files",
+      images_not_deleted: deleteErrors,
+      newValues,
+      productToUpdate,
+    });
+  }
+  res.status(200).json({ productToUpdate });
+};
 
-	let productToUpdate = await Product.findOneAndUpdate({ _id: id }, { ...newValues });
+const productCount = async (req, res) => {
+  const productCount = await Product.countDocuments({});
 
-	if (deleteErrors.length > 0) {
-		return res.status(207).json({
-			message: "Product deleted, with errors in deleting files",
-			images_not_deleted: deleteErrors,
-			newValues,
-			productToUpdate
-		})
-	}
+  if (!productCount) {
+    return res.status(500).json({ success: false });
+  }
 
-	res.status(200).json({ productToUpdate, newValues });
-}
+  res.status(200).json({ productCount: productCount });
+};
 
 module.exports = {
-	getAllProducts,
-	getProductById,
-	addProduct,
-	deleteProduct,
-	updateProduct
-}
+  getAllProducts,
+  getProductById,
+  addProduct,
+  deleteProduct,
+  updateProduct,
+  productCount,
+};

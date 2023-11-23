@@ -5,6 +5,7 @@ const {
 	addProduct,
 	deleteProduct,
 	updateProduct,
+	productCount,
 } = require('../controllers/productControllers');
 
 const uploadMiddleWare = require('../middleware/upload');
@@ -20,6 +21,8 @@ router.post('/', uploadMiddleWare, addProduct);
 
 router.delete('/:id', deleteProduct);
 
-router.patch('/:id', uploadMiddleWare, updateProduct);
+router.put('/:id', uploadMiddleWare, updateProduct);
+
+router.get("/get/count", productCount);
 
 module.exports = router;
