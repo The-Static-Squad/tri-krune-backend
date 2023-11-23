@@ -38,15 +38,6 @@ const getProductById = async (req, res) => {
 };
 
 const addProduct = async (req, res) => {
-  // const data = req.body;
-  // const product = new Product({ ...data });
-  // console.log(data)
-
-  // convert tags input from a string to an array
-  // if (req.body.tags) {
-  // 	product.tags = toArray(req.body.tags);
-  // }
-
   const tags = req.body.tags || "[]";
   let category = parseValue(req.body.category, "string");
 
@@ -88,26 +79,6 @@ const addProduct = async (req, res) => {
       product.images[position] = basePath + newFilename;
     }
   }
-
-  // console.log(product.images)
-
-  // if (req.files.addImages) {
-  // 	req.files.addImages.forEach(image => {
-  // 		product.pictures.push(image.path);
-  // 	});
-  // }
-
-  // console.log(product)
-
-  // if (req.files["prodImg"] && req.files["addImages"]) {
-  //   const mainImg = images["prodImage"][0];
-  //   const additionalImgs = images["addImages"];
-  //   product.mainImg = mainImg.path;
-
-  //   additionalImgs.forEach((image) => {
-  //     product.pictures.push(image.path);
-  //   });
-  // }
 
   try {
     const addedProduct = await product.save();
@@ -159,10 +130,6 @@ const deleteProduct = async (req, res) => {
 
 const updateProduct = async (req, res) => {
   const id = req.params.id;
-  // const newValues = req.body;
-  // for (let item of req.body.images) {
-  //   console.log(JSON.parse(item));
-  // }
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res(400).json({ message: "invalid Id" });
@@ -175,7 +142,6 @@ const updateProduct = async (req, res) => {
   }
 
   let oldImagesPaths = existingProduct.images;
-  // console.log(oldImagesPaths);
   let newImagesOrder = [];
 
   if (req.files.length > 0) {
@@ -205,8 +171,6 @@ const updateProduct = async (req, res) => {
     }
   }
 
-  // console.log(newImagesOrder);
-
   if (req.body.images) {
     console.log(req.body.images)
     for (let newImageOrder of req.body.images) {
@@ -225,32 +189,9 @@ const updateProduct = async (req, res) => {
         }
       });
 
-      // console.log(newPath)
-      // if(typeof req.body.images === 'string') {
-      //   newPath.join('')
-      // }
-
-      // console.log(...newPath, position);
-      // fs.rename(oldPath, newPath, (err) => {
-      //   if (err) {
-      //     console.error("Error renaming file:", err);
-      //   } else {
-      //     console.log("File renamed successfully.");
-      //   }
-      // });
       newImagesOrder[position] = newPath[0];
     }
   }
-console.log(newImagesOrder)
-  // for (newImage of newImagesOrder) {
-  //   oldImagesPaths.forEach((oldImage) => {
-  //     if (oldImage !== newImage) {
-  //       console.log(oldImage);
-  //     } else {
-  //       // console.log(oldImage, image)
-  //     }
-  //   });
-  // }
 
   for(oldImage of oldImagesPaths) {
     if(!newImagesOrder.includes(oldImage)) {
@@ -260,103 +201,15 @@ console.log(newImagesOrder)
         if (err) throw err;
         console.log(`${extractedOldImagePath} was deleted`);
       });
-
-      // console.log(extractedOldImagePath)
     }
   }
-  // let images;
-  // // images = JSON.parse()
-  // if (req.files.length > 0) {
-  //   for (let image of req.files) {
-  //     // product.images.push(image.path);
-  //     console.log(image);
-  //   }
-  // }
-
-  // console.log(product.images);
-  /*  let oldMainImage = product.mainImg; //previosly set main image
-  let oldAddImages = product.pictures; //previosly set additional images */
 
   const deleteErrors = [];
-
-  //Handle main image update
-  //************************
-  //Check if the request holds the path of main image that should be kept
-  /* if (!newValues.mainImg) {
-
-		if (oldMainImage) {
-			try {
-				fs.unlinkSync(oldMainImage);
-			} catch (err) {
-				deleteErrors.push(err);
-			}
-		}
-
-		if (req.files.prodImage) {
-			newValues.mainImg = req.files.prodImage[0].path;
-		} else {
-			newValues.mainImg = '';
-		}
-	} */
-
-  /* if (req.files.images) {
-    if (req.files.images[0]) {
-      if (oldMainImage) {
-        try {
-          fs.unlinkSync(oldMainImage);
-        } catch (err) {
-          deleteErrors.push(err);
-        }
-      }
-      newValues.mainImg = req.files.images[0].path;
-    }
-  } else {
-    newValues.mainImg = oldMainImage;
-  } */
-
-  //Handle additional images update
-  //*******************************
-
-  //Check if the request holds the paths of images that should be kept
-  //Make sure to get an array
-  /* 	if (!newValues.pictures) {
-		//If there's no pictures to be saved, create an empty array
-		newValues.pictures = [];
-	} else {
-		//If request holds a string of paths, convert it to array
-		if (typeof newValues.pictures === "string") {
-			newValues.pictures = newValues.pictures.split(',');
-		}
-	} */
-
-  //Compare images' paths to be kept, sent by request body, with all previosly attached images' paths
-  //Compare arrays of images already attached to previous product version and delete unnecessary
-  /* oldAddImages.forEach(oldImg => {
-		if (!newValues.pictures.includes(oldImg)) {
-			try {
-				fs.unlinkSync(oldImg);
-			} catch (err) {
-				deleteErrors.push(err);
-			}
-		}
-	});
-
-	//Check if new image(s) had been added to request
-	//Add new image path(s) to the update values
-	//The values in the second array respond to the product additional images
-	//(Input field addImages provides an array of attached files; it is limited to max three values)
-	if (req.files.addImages) {
-		//Add paths of new images to update values
-		newValues.pictures = newValues.pictures.concat(req.files.addImages.map(img => img.path));
-	} */
-
+ 
   const tags = req.body.tags || "[]";
 
   let discountPrice = parseValue(req.body.discountPrice, 'number');
   let category = parseValue(req.body.category, 'string');
-
-  // let category = parseValue(req.body.category);
-
 
   let productToUpdate = await Product.findByIdAndUpdate(id, {
     name: req.body.name,
@@ -378,7 +231,6 @@ console.log(newImagesOrder)
       productToUpdate,
     });
   }
-  // res.status(200).json("cool");
   res.status(200).json({ productToUpdate });
 };
 

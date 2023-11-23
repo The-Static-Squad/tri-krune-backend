@@ -28,23 +28,8 @@ const productSchema = mongoose.Schema(
       type: [String],
     },
     discountPrice: {
-      // type: Number,
       type: Schema.Types.Mixed, 
-      // default: null,
     },
-    // images: [
-    //   {
-    //     filename: {
-    //       type: String,
-    //       default: "",
-    //     },
-    //     isMain: {
-    //       type: Boolean,
-    //       default: false,
-    //     },
-    //     _id: false,
-    //   },
-    // ],
     images: [{ type: String }],
     highlighted: {
       type: Boolean,

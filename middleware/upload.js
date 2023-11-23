@@ -17,14 +17,6 @@ const uploadFiles = (req, res, next) => {
 	//Allowed max image size in Mb
 	const size = 5;
 
-	//Image counter per product-includes serial number of image uploaded to image name
-	// let counter = 1;
-
-	//Create image name on upload by the model: productName-imgNo.ext
-	// const nameFile = (req, file) => {
-	// 	return req.body.name + '-img' + counter++ + path.extname(file.originalname);
-	// }
-
 	//Exclude from the upload files that don't belong to allowed types
 	const fileTypeFilter = (req, imgFile, cllbck) => {
 		const allowedTypes = ['jpg', 'jpeg', 'png'];
