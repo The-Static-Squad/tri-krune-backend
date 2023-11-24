@@ -12,7 +12,15 @@ app.use(cors());
 app.options("*", cors());
 app.use(authJwt());
 app.use(errorHandler);
+const corsOptions = {
+  origin: "https://yourfrontend.com", // Replace with the actual origin of your frontend
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials: true,
+  optionsSuccessStatus: 204,
+  allowedHeaders: "Content-Type,Authorization",
+};
 
+app.use(cors(corsOptions));
 
 const api = process.env.API_URL;
 const dbName = process.env.DB_NAME;
