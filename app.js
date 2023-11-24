@@ -13,7 +13,7 @@ app.options("*", cors());
 app.use(authJwt());
 app.use(errorHandler);
 const corsOptions = {
-  origin: "https://yourfrontend.com", // Replace with the actual origin of your frontend
+  origin: "https://the-static-squad.github.io",
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
   optionsSuccessStatus: 204,
