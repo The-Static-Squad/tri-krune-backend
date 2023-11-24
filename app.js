@@ -11,6 +11,7 @@ const errorHandler = require("./helpers/error-handler");
 app.use(cors());
 app.options("*", cors());
 app.use(authJwt());
+app.use("/public", express.static(__dirname + "/public"));
 app.use(errorHandler);
 
 
@@ -27,7 +28,7 @@ const usersRouter = require("./routes/user");
 app.use(express.json());
 app.use(logger("tiny"));
 app.use(bodyParser.urlencoded({extended: true}));
-app.use('/public', express.static('public'));
+// app.use('/public', express.static('public'));
 
 app.use(`${api}/products`, productsRouter);
 app.use(`${api}/search`, searchRouter);

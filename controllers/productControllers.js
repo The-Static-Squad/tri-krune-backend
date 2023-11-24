@@ -88,7 +88,7 @@ const addProduct = async (req, res) => {
       //     console.log("File renamed successfully.");
       //   }
       // });
-      renameFile(`/public/${oldFilename}`, `/public/${newFilename}`);
+      renameFile(`public/${oldFilename}`, `public/${newFilename}`);
       product.images[position] = basePath + newFilename;
     }
   }
