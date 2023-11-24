@@ -1,22 +1,12 @@
 const Product = require("../models/product");
 const mongoose = require("mongoose");
 const fs = require("fs");
-const { rename } = require("node:fs/promises");
 
 function parseValue(value, type) {
   if(type === 'number') {
     return value === "null" ? 0 : value;
   } else if (type === 'string'){
     return value === "null" ? ' ' : value;;
-  }
-}
-
-async function renameFile(oldPath, newPath) {
-  try {
-    rename(oldPath, newPath);
-    console.log("File renamed successfully.");
-  } catch (error) {
-    console.error("Error renaming file:", error);
   }
 }
 
@@ -79,16 +69,13 @@ const addProduct = async (req, res) => {
           }
         })
         .join("-");
-
-
-      // fs.rename(`public/${oldFilename}`, `public/${newFilename}`, (err) => {
-      //   if (err) {
-      //     console.error("Error renaming file:", err);
-      //   } else {
-      //     console.log("File renamed successfully.");
-      //   }
-      // });
-      renameFile(`public/${oldFilename}`, `public/${newFilename}`);
+      fs.rename(`public/${oldFilename}`, `public/${newFilename}`, (err) => {
+        if (err) {
+          console.error("Error renaming file:", err);
+        } else {
+          console.log("File renamed successfully.");
+        }
+      });
       product.images[position] = basePath + newFilename;
     }
   }
