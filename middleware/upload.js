@@ -6,7 +6,7 @@ const uploadFiles = (req, res, next) => {
 	const storage = multer.diskStorage(
 		{
 			destination: (req, file, cb) => {
-				cb(null, './public/');
+				cb(null, 'public');
 			},
 			filename: (req, file, cb) => {
 				cb(null, Date.now() + '+' + file.originalname );
@@ -42,7 +42,7 @@ const uploadFiles = (req, res, next) => {
 
 	upload.array('images', 5)(req, res, (err) => {
 		if (err) {
-			return res.status(400).json({ error: "Upload failed", err });
+			return res.status(400).json({ error: "Upload faileds", err });
 		}
 		next();
 	});
