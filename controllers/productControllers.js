@@ -14,7 +14,8 @@ const getAllProducts = async (req, res) => {
   const products = await Product.find({}).sort({ name: -1 });
 
   if (products.length === 0) {
-    return res.status(404).json({ message: "no products found" });
+    return res.status(200).json([])
+    // return res.status(404).json({ message: "no products found" });
   }
 
   res.status(200).json(products);
@@ -238,7 +239,7 @@ const productCount = async (req, res) => {
   const productCount = await Product.countDocuments({});
 
   if (!productCount) {
-    return res.status(500).json({ success: false });
+    return res.status(200).json([])
   }
 
   res.status(200).json({ productCount: productCount });
