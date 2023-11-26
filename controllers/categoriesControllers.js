@@ -5,7 +5,8 @@ const getCategories = async (req, res) => {
 	const categories = await Category.find({}).sort({ name: 1 });
 
 	if (categories.length === 0) {
-		return res.status(404).json({message: "No categories found"})
+		return res.status(200).json([])
+		// return res.status(404).json({message: "No categories found"})
 	}
 
 	res.status(200).json(categories);

@@ -1,7 +1,6 @@
 const Product = require("../models/product");
 const mongoose = require("mongoose");
 const fs = require("fs");
-const { rename } = require("node:fs/promises");
 
 function parseValue(value, type) {
   if(type === 'number') {
@@ -11,20 +10,12 @@ function parseValue(value, type) {
   }
 }
 
-async function renameFile(oldPath, newPath) {
-  try {
-    rename(oldPath, newPath);
-    console.log("File renamed successfully.");
-  } catch (error) {
-    console.error("Error renaming file:", error);
-  }
-}
-
 const getAllProducts = async (req, res) => {
   const products = await Product.find({}).sort({ name: -1 });
 
   if (products.length === 0) {
-    return res.status(404).json({ message: "no products found" });
+    return res.status(200).json([])
+    // return res.status(404).json({ message: "no products found" });
   }
 
   res.status(200).json(products);
@@ -79,16 +70,13 @@ const addProduct = async (req, res) => {
           }
         })
         .join("-");
-
-
-      // fs.rename(`public/${oldFilename}`, `public/${newFilename}`, (err) => {
-      //   if (err) {
-      //     console.error("Error renaming file:", err);
-      //   } else {
-      //     console.log("File renamed successfully.");
-      //   }
-      // });
-      renameFile(`public/${oldFilename}`, `public/${newFilename}`);
+      fs.rename(`public/${oldFilename}`, `public/${newFilename}`, (err) => {
+        if (err) {
+          console.error("Error renaming file:", err);
+        } else {
+          console.log("File renamed successfully.");
+        }
+      });
       product.images[position] = basePath + newFilename;
     }
   }
@@ -251,7 +239,7 @@ const productCount = async (req, res) => {
   const productCount = await Product.countDocuments({});
 
   if (!productCount) {
-    return res.status(500).json({ success: false });
+    return res.status(200).json([])
   }
 
   res.status(200).json({ productCount: productCount });
