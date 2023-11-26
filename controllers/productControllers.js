@@ -56,7 +56,7 @@ const addProduct = async (req, res) => {
 
   if (req.files.length > 0) {
     for (let image of req.files) {
-      const basePath = `${req.protocol}://${req.get("host")}/public/`;
+      const basePath = `${req.protocol}://${req.get("host")}/public/uploads/`;
       const oldFilename = image.filename;
       let position;
       const newFilename = oldFilename
@@ -70,7 +70,7 @@ const addProduct = async (req, res) => {
           }
         })
         .join("-");
-      fs.rename(`public/${oldFilename}`, `public/${newFilename}`, (err) => {
+      fs.rename(`public/uploads/${oldFilename}`, `public/uploads/${newFilename}`, (err) => {
         if (err) {
           console.error("Error renaming file:", err);
         } else {
@@ -147,7 +147,7 @@ const updateProduct = async (req, res) => {
 
   if (req.files.length > 0) {
     for (let image of req.files) {
-      const basePath = `${req.protocol}://${req.get("host")}/public/`;
+      const basePath = `${req.protocol}://${req.get("host")}/public/uploads/`;
       const oldFilename = image.filename;
       let position;
       const newFilename = oldFilename
@@ -161,7 +161,7 @@ const updateProduct = async (req, res) => {
           }
         })
         .join("-");
-      fs.rename(`public/${oldFilename}`, `public/${newFilename}`, (err) => {
+      fs.rename(`public/uploads/${oldFilename}`, `public/uploads/${newFilename}`, (err) => {
         if (err) {
           console.error("Error renaming file:", err);
         } else {
