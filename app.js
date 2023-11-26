@@ -11,7 +11,7 @@ const errorHandler = require("./helpers/error-handler");
 app.use(cors());
 app.options("*", cors());
 app.use(authJwt());
-app.use("/public", express.static(__dirname + "/public"));
+app.use("/public/uploads", express.static(__dirname + "/public/uploads"));
 app.use(errorHandler);
 
 

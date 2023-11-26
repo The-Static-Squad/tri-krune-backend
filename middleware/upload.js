@@ -42,7 +42,7 @@ const uploadFiles = (req, res, next) => {
 
 	upload.array('images', 5)(req, res, (err) => {
 		if (err) {
-			return res.status(400).json({ error: "Upload faileds", err });
+			return res.status(400).json({ error: "Upload failed", err });
 		}
 		next();
 	});
