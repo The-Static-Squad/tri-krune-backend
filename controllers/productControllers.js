@@ -173,7 +173,7 @@ const updateProduct = async (req, res) => {
   }
 
   if (req.body.images) {
-    console.log(req.body.images)
+    // console.log(req.body.images)
     for (let newImageOrder of req.body.images) {
       let position;
       
